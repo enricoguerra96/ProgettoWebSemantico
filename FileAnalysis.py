@@ -60,27 +60,7 @@ def is_correct(input_text: str, lang: str):
         return "Language not supported."
 
 
-def stemming(input_words: list):
-    snow_stemmer = SnowballStemmer(language='italian')
-    stem_words = []
-    for w in input_words:
-        x = snow_stemmer.stem(w)
-        stem_words.append(x)
-
-    return stem_words
-
-
-def lemmatize(input_words: list):
-    lemmas = []
-    for word in input_words:
-        lemma = nlp(word)
-        for tok in lemma:
-            lemmas.append(tok.lemma_)
-    return lemmas
-
-
 def text_analysis(input_text: str):
-
     # Tokenization
     text_toked = word_tokenize(input_text)
 
@@ -138,7 +118,6 @@ def bufale_scrap_download(url: str, index: str):
     ind = 0
     for text in in_links:
         if ind != len(in_links):
-            time_obj = datetime.now()
             new_href = in_hrefs[ind].replace('https://www.bufale.net/', '')[:-1]
             filename = "./BufaleNet/Pagine/" + new_href + ".txt"
             with open(filename, 'w') as w:
@@ -146,10 +125,75 @@ def bufale_scrap_download(url: str, index: str):
             ind += 1
 
 
+def butac_scrap_download(url: str, index: str):
+    # save as local HTML (Indici)
+    time_obj = datetime.now()
+    filename = "./Butac/Indici/" + str(index) + "_" + str(time_obj) + ".html"
+    urllib.request.urlretrieve(url, filename)
+
+    # Scrap HTML files with BS
+    with open(filename, 'r') as f:
+        contents = f.read()
+        soup = BeautifulSoup(contents, 'lxml')
+
+    # Move links(titles) to in_links
+    whocares_hrefs = ['https://www.butac.it/guida-2/', 'https://www.butac.it/fake-news/',
+                      'https://www.butac.it/notizia-vera/',
+                      'https://www.butac.it/speciale-coronavirus-covid-19/', 'https://www.butac.it/ambiente-e-animali/',
+                      'https://www.butac.it/giornalismo-pseudogiornalismo/',
+                      'https://www.butac.it/scienza-e-tecnologia/',
+                      'https://www.butac.it/teorie-del-complotto/', 'https://www.butac.it/xenofobia-2/',
+                      'https://www.butac.it/the-black-list/', 'https://www.butac.it/chi-siamo/',
+                      'https://www.butac.it/parlano-di-noi/',
+                      'https://www.butac.it/citazioni-e-leggende-urbane/']
+
+    in_links = []
+    in_hrefs = []
+    in_hrefs_ok = []
+    in_texts_href = []
+    in_texts_href_ok = []
+    for element in soup.find_all('a'):
+        href = element.get('href')
+        if str(href) is not None and str(href) != '' and str(href) not in whocares_hrefs \
+                and 'https://www.butac.it/' in str(href) and '-' in str(href):
+            text = element.text
+            in_texts_href.append(text)
+            in_hrefs.append(str(href))
+
+    # Remove duplicate hrefs
+    [in_hrefs_ok.append(x) for x in in_hrefs if x not in in_hrefs_ok]
+    [in_texts_href_ok.append(x) for x in in_texts_href if x not in in_texts_href_ok]
+
+    # Scrap texts from pages
+    for ok_link in in_hrefs_ok:
+        page = requests.get(ok_link)
+        text_soup = BeautifulSoup(page.text, "lxml")
+        temp = ""
+        for t in text_soup.find_all(class_="textArticle"):
+            temp += t.text
+        in_links.append(temp)
+
+    # Divide in files and save
+    for ind in range(0, len(in_links)):
+        new_href = in_hrefs[ind].replace('https://www.butac.it/', '')[:-1]
+        filename = "./Butac/Pagine/" + new_href + ".txt"
+        with open(filename, 'w') as w:
+            w.write(str(count_frequencies(text_analysis(in_links[ind]))))
+
+
+def butac_checkupdates():
+    basic_url = "https://www.butac.it/bufala/page/"
+    #butac_scrap_download("https://www.butac.it/bufala", str(1))
+    for i in range(4, 10):
+        new_url = basic_url
+        new_url += str(i)
+        butac_scrap_download(new_url, str(i))
+
+
 def bufale_checkupdates():
     basic_url = "https://www.bufale.net/bufala/page/"
-    bufale_scrap_download("https://www.bufale.net/bufala/", str(1))
-    for i in range(4, 10):
+    bufale_scrap_download("https://www.bufale.net/bufala", str(1))
+    for i in range(2, 10):
         new_url = basic_url
         new_url += str(i)
         bufale_scrap_download(new_url, str(i))
@@ -161,7 +205,8 @@ def simil_spacy(input1: str, input2: str):
     return round(main.similarity(new), 2)
 
 
-def news_control(news: str):
+def bufale_news_control(news: str):
+    # Retrieve the maximum similarity index
     input1_string = count_frequencies(text_analysis(news))
     directory = "./BufaleNet/Pagine/"
     simil_records = []
@@ -176,8 +221,10 @@ def news_control(news: str):
 
 
 # bufale_checkupdates()
-news_control("Gli esperti infatti raccomandano non solo che il vaccino vaccino vaccino deve essere somministrato in ambienti che "
+"""bufale_news_control("Gli esperti infatti raccomandano non solo che il vaccino vaccino vaccino deve essere somministrato in ambienti che "
              "dispongono di scorte, inclusi ossigeno e adrenalina, proprio per gestire le reazioni reazioni anafilattiche, "
              "ma anche defibrillatore per una sorte di rianimazione immediata a seguito dell’inoculazione di queste "
              "“oscure sostanze” capaci di manipolare il DNA creando in futuro qualsiasi tipo di reazione avversa o "
              "patologia potenzialmente mortale mortale.")
+"""
+butac_checkupdates()
