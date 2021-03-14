@@ -1,20 +1,22 @@
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-import requests
-from bs4 import BeautifulSoup
-from textblob import TextBlob
-import language_tool_python
-import csv
+import os
 import urllib.request
 from datetime import datetime
-from nltk.stem.snowball import SnowballStemmer
-from nltk.stem import WordNetLemmatizer
-import os
-import ast
+
+import language_tool_python
+import requests
 import spacy
+from bs4 import BeautifulSoup
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from translate import Translator
 
 nlp = spacy.load("it_core_news_lg")
+
+
+def text_translation(text: str):
+    translator = Translator(to_lang="Italian")
+    translation = translator.translate(text)
+    return translation
 
 
 def count_frequencies(input_text: list):
@@ -46,18 +48,19 @@ def is_correct(input_text: str, lang: str):
     try:
         tool = language_tool_python.LanguageTool(lang)
         matches = tool.check(input_text)
+        ok_words = ["Covid-19", "Covid", "COVID-19", "Coronavirus", "coronavirus", "SARS", "sars"]
 
         if len(matches) == 0:
-            return "Correct"
+            return print("Grammar: correct")
         else:
             result = ''
-            result += str(len(matches)) + " possible errors found: "
+            result += str(len(matches)) + " possible error(s) found: "
         for m in matches:
-            result += m.matchedText + " "
-        return result
-
+            if m.matchedText not in ok_words:
+                result += "\n" + m.matchedText
+        print(result)
     except ValueError:
-        return "Language not supported."
+        return print("Language not supported.")
 
 
 def text_analysis(input_text: str):
@@ -183,8 +186,8 @@ def butac_scrap_download(url: str, index: str):
 
 def butac_checkupdates():
     basic_url = "https://www.butac.it/bufala/page/"
-    #butac_scrap_download("https://www.butac.it/bufala", str(1))
-    for i in range(4, 10):
+    # butac_scrap_download("https://www.butac.it/bufala", str(1))
+    for i in range(10, 20):
         new_url = basic_url
         new_url += str(i)
         butac_scrap_download(new_url, str(i))
@@ -205,26 +208,65 @@ def simil_spacy(input1: str, input2: str):
     return round(main.similarity(new), 2)
 
 
-def bufale_news_control(news: str):
-    # Retrieve the maximum similarity index
-    input1_string = count_frequencies(text_analysis(news))
-    directory = "./BufaleNet/Pagine/"
-    simil_records = []
-    simil_texts = []
-    for filename in os.listdir(directory):
-        with open(directory + filename, 'r') as f:
-            input2 = f.read()
-            simil_records.append(simil_spacy(input1_string, input2))
-            simil_texts.append(str(filename))
-    m = max(simil_records)
-    print(simil_texts[simil_records.index(m)] + " : " + str(m))
+def news_control(news: str, site: str):
+    # Retrieve the maximum similarity index for each news in the directory
+    try:
+        input1_string = count_frequencies(text_analysis(news))
+        directory = "./" + site + "/Pagine/"
+        simil_records = []
+        simil_texts = []
+        for filename in os.listdir(directory):
+            with open(directory + filename, 'r') as f:
+                input2 = f.read()
+                simil_records.append(simil_spacy(input1_string, input2))
+                simil_texts.append(str(filename))
+
+        for _ in range(0, 3):
+            m = max(simil_records)
+            if site == "BufaleNet":
+                print("https://www.bufale.net/" + simil_texts[simil_records.index(m)][:-4] + " : " + str(m))
+                simil_records.remove(m)
+            else:
+                print("https://www.butac.it/" + simil_texts[simil_records.index(m)][:-4] + " : " + str(m))
+                simil_records.remove(m)
+
+    except FileNotFoundError:
+        print("No directory with this name.")
+    except ValueError:
+        print("Maybe there are no pages in this directory.")
 
 
 # bufale_checkupdates()
-"""bufale_news_control("Gli esperti infatti raccomandano non solo che il vaccino vaccino vaccino deve essere somministrato in ambienti che "
-             "dispongono di scorte, inclusi ossigeno e adrenalina, proprio per gestire le reazioni reazioni anafilattiche, "
-             "ma anche defibrillatore per una sorte di rianimazione immediata a seguito dell’inoculazione di queste "
-             "“oscure sostanze” capaci di manipolare il DNA creando in futuro qualsiasi tipo di reazione avversa o "
-             "patologia potenzialmente mortale mortale.")
+
+# butac_checkupdates()
+
 """
-butac_checkupdates()
+def analyze_news():
+    it_text = ""
+    print("Insert text:\n")
+    text = input()
+    print("\n")
+    is_correct(text, "it")
+    print("\n Similarities:")
+    news_control(text, "BufaleNet")
+    news_control(text, "Butac")
+
+
+analyze_news()
+
+"""
+
+news_control("Pillon pillon pillon atleti atleti atleti transessuali transessuali transessuali", "BufaleNet")
+
+"""
+#s_correct("Gli articoli riportano un dato corretto, è vero che è l’Italia il Paese che ha segnalato più reazioni "
+           "avverse, però sia il Messaggero che il Primato Nazionale omettono completamente di menzionare "
+           "(o sbagliano) alcune informazioni che ritengo siano essenziali per contestualizzare. La prima, "
+           "forse la più importante. Il Primato Nazionale nel suo titolo aggiunge la parola “gravi”, ma è una bugia, "
+           "la pagina linkata riporta tutte le segnalazioni di reazioni avverse (e non allergiche) al vaccino. "
+           "Un lieve dolore al braccio è una reazione avversa, due linee di febbre sono una reazione avversa, "
+           "un po’ di mal di testa è una reazione avversa. E così via. Di reazioni gravi su tutto il territorio "
+           "europeo ne sono segnalate alcune centinaia (per ora sono 320 in totale), purtroppo non è possibile "
+           "fare un controllo su quale sia il Paese da cui ne arrivano di più, ma rispetto al numero di "
+           "vaccinazioni fatte sono poche.", "it")
+"""
