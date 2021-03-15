@@ -1,8 +1,11 @@
 # ProgettoWebSemantico
 
 Primo prototipo di progetto web semantico, classificazione di testi e confronto su siti di rilevazione fake news.
-**Input**: testo di una news
-**Output**: eventuali errori grammaticali e prime 3 news più simili nei siti Butac e BufaleNet
+
+**Input**: testo di una news 
+
+**Output**: eventuali errori grammaticali e prime 3 news più simili nei siti Butac e BufaleNet. \n
+
 Tutto il codice è in _FileAnalysis.py_
 
 ## Procedura semplificata
