@@ -4,7 +4,7 @@ Primo prototipo di progetto web semantico, classificazione di testi e confronto 
 
 **Input**: testo di una news 
 
-**Output**: eventuali errori grammaticali e prime 3 news più simili nei siti Butac e BufaleNet. \n
+**Output**: eventuali errori grammaticali e prime 3 news più simili nei siti Butac e BufaleNet.
 
 Tutto il codice è in _FileAnalysis.py_
 
