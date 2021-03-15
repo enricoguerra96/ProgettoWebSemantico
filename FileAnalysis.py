@@ -245,13 +245,8 @@ def analyze_news():
     news_control(text, "Butac")
 
 
-#analyze_news()
+analyze_news()
 
-bufale_checkupdates()
+# bufale_checkupdates()
 
-butac_checkupdates()
-
-
-"""
-news_control("Pillon Pillon Pillon atleti atleti atleti transessuali transessuali transessuali askdfbasdk", "BufaleNet")
-"""
+# butac_checkupdates()
