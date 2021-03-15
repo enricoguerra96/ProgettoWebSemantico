@@ -35,11 +35,14 @@ def count_frequencies(input_text: list):
         if value > 1:
             correct_frequency[key] = value
 
-    # Re-create string
+    # Re-create string, cut words to 30
     correct_str = ""
+    limit = 0
     for key, value in correct_frequency.items():
-        for i in range(0, value):
-            correct_str += str(key) + " "
+        if limit < 30:
+            for i in range(0, value):
+                correct_str += str(key) + " "
+        limit += 1
 
     return correct_str
 
@@ -184,8 +187,8 @@ def butac_scrap_download(url: str, index: str):
 
 def butac_checkupdates():
     basic_url = "https://www.butac.it/bufala/page/"
-    butac_scrap_download("https://www.butac.it/bufala", str(1))
-    for i in range(2, 20):
+    # butac_scrap_download("https://www.butac.it/bufala", str(1))
+    for i in range(10, 20):
         new_url = basic_url
         new_url += str(i)
         butac_scrap_download(new_url, str(i))
@@ -235,7 +238,6 @@ def news_control(news: str, site: str):
 
 
 def analyze_news():
-    it_text = ""
     print("Insert text:\n")
     text = input()
     print("\n")
