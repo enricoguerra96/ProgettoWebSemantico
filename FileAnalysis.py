@@ -53,12 +53,10 @@ def is_correct(input_text: str, lang: str):
         if len(matches) == 0:
             return print("Grammar: correct")
         else:
-            result = ''
-            result += str(len(matches)) + " possible error(s) found: "
-        for m in matches:
-            if m.matchedText not in ok_words:
-                result += "\n" + m.matchedText
-        print(result)
+            print(str(len(matches)) + " possible error(s) found: ")
+            for m in matches:
+                if m not in ok_words:
+                    print(m.matchedText + " : " + m.ruleId)
     except ValueError:
         return print("Language not supported.")
 
@@ -78,7 +76,7 @@ def text_analysis(input_text: str):
             with open("./BufaleNet/banned_words", 'r') as f:
                 content = f.read()
                 if tok not in content:
-                    filtered_text.append(tok)
+                    filtered_text.append(tok.lower())
     return filtered_text
 
 
@@ -186,8 +184,8 @@ def butac_scrap_download(url: str, index: str):
 
 def butac_checkupdates():
     basic_url = "https://www.butac.it/bufala/page/"
-    # butac_scrap_download("https://www.butac.it/bufala", str(1))
-    for i in range(10, 20):
+    butac_scrap_download("https://www.butac.it/bufala", str(1))
+    for i in range(2, 20):
         new_url = basic_url
         new_url += str(i)
         butac_scrap_download(new_url, str(i))
@@ -195,8 +193,8 @@ def butac_checkupdates():
 
 def bufale_checkupdates():
     basic_url = "https://www.bufale.net/bufala/page/"
-    bufale_scrap_download("https://www.bufale.net/bufala", str(1))
-    for i in range(2, 10):
+    # bufale_scrap_download("https://www.bufale.net/bufala", str(1))
+    for i in range(10, 20):
         new_url = basic_url
         new_url += str(i)
         bufale_scrap_download(new_url, str(i))
@@ -236,11 +234,6 @@ def news_control(news: str, site: str):
         print("Maybe there are no pages in this directory.")
 
 
-# bufale_checkupdates()
-
-# butac_checkupdates()
-
-"""
 def analyze_news():
     it_text = ""
     print("Insert text:\n")
@@ -252,21 +245,13 @@ def analyze_news():
     news_control(text, "Butac")
 
 
-analyze_news()
+#analyze_news()
+
+bufale_checkupdates()
+
+butac_checkupdates()
+
 
 """
-
-news_control("Pillon pillon pillon atleti atleti atleti transessuali transessuali transessuali", "BufaleNet")
-
-"""
-#s_correct("Gli articoli riportano un dato corretto, è vero che è l’Italia il Paese che ha segnalato più reazioni "
-           "avverse, però sia il Messaggero che il Primato Nazionale omettono completamente di menzionare "
-           "(o sbagliano) alcune informazioni che ritengo siano essenziali per contestualizzare. La prima, "
-           "forse la più importante. Il Primato Nazionale nel suo titolo aggiunge la parola “gravi”, ma è una bugia, "
-           "la pagina linkata riporta tutte le segnalazioni di reazioni avverse (e non allergiche) al vaccino. "
-           "Un lieve dolore al braccio è una reazione avversa, due linee di febbre sono una reazione avversa, "
-           "un po’ di mal di testa è una reazione avversa. E così via. Di reazioni gravi su tutto il territorio "
-           "europeo ne sono segnalate alcune centinaia (per ora sono 320 in totale), purtroppo non è possibile "
-           "fare un controllo su quale sia il Paese da cui ne arrivano di più, ma rispetto al numero di "
-           "vaccinazioni fatte sono poche.", "it")
+news_control("Pillon Pillon Pillon atleti atleti atleti transessuali transessuali transessuali askdfbasdk", "BufaleNet")
 """
