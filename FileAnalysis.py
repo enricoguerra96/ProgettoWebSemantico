@@ -246,7 +246,7 @@ clean_dir("./BufaleNet/Indici/")
 clean_dir("./BufaleNet/Pagine/")
 clean_dir("./Butac/Indici/")
 clean_dir("./Butac/Pagine/")
-# bufale_checkupdates()
+bufale_checkupdates()
 butac_checkupdates()
 analyze_news()
 
