@@ -14,6 +14,7 @@ Tutto il codice è in _FileAnalysis.py_
 - Creazione bag of words dei testi
 - Eliminazione stopwords
 - Eliminazione parole con TF = 1
+- Eliminazione delle ultime parole (cutoff = 30), solitamente parole meno importanti in un articolo
 - Confronto dei bag of words, rilevamento similitudine con **spacy** (cosine similarity)
 
 **Se la news è presente nei due siti, sicuramente comparirà tra le 3 news riportate.**
