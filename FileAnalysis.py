@@ -1,4 +1,4 @@
-import os
+import os, shutil
 import urllib.request
 from datetime import datetime
 
@@ -17,6 +17,11 @@ def text_translation(text: str):
     translator = Translator(to_lang="Italian")
     translation = translator.translate(text)
     return translation
+
+
+def clean_dir(dir_path):
+    shutil.rmtree(dir_path)
+    os.mkdir(dir_path)
 
 
 def count_frequencies(input_text: list):
@@ -40,10 +45,9 @@ def count_frequencies(input_text: list):
     limit = 0
     for key, value in correct_frequency.items():
         if limit < 30:
-            for i in range(0, value):
+            for i in range(value):
                 correct_str += str(key) + " "
         limit += 1
-
     return correct_str
 
 
@@ -104,8 +108,7 @@ def bufale_scrap_download(url: str, index: str):
         soup = BeautifulSoup(contents, 'lxml')
 
     # Move links(titles) and texts to in_links
-    in_links = []
-    in_hrefs = []
+    in_links, in_hrefs = [], []
     for element in soup.select('a'):
         href = element.get('href')
         if str(href) is not None and str(href) != '' and '-' in str(href):
@@ -151,11 +154,7 @@ def butac_scrap_download(url: str, index: str):
                       'https://www.butac.it/parlano-di-noi/',
                       'https://www.butac.it/citazioni-e-leggende-urbane/']
 
-    in_links = []
-    in_hrefs = []
-    in_hrefs_ok = []
-    in_texts_href = []
-    in_texts_href_ok = []
+    in_links, in_hrefs, in_hrefs_ok, in_texts_href, in_texts_href_ok = [], [], [], [], []
     for element in soup.find_all('a'):
         href = element.get('href')
         if str(href) is not None and str(href) != '' and str(href) not in whocares_hrefs \
@@ -178,7 +177,7 @@ def butac_scrap_download(url: str, index: str):
         in_links.append(temp)
 
     # Divide in files and save
-    for ind in range(0, len(in_links)):
+    for ind in range(len(in_links)):
         new_href = in_hrefs[ind].replace('https://www.butac.it/', '')[:-1]
         filename = "./Butac/Pagine/" + new_href + ".txt"
         with open(filename, 'w') as w:
@@ -188,9 +187,8 @@ def butac_scrap_download(url: str, index: str):
 def butac_checkupdates():
     basic_url = "https://www.butac.it/bufala/page/"
     # butac_scrap_download("https://www.butac.it/bufala", str(1))
-    for i in range(10, 20):
-        new_url = basic_url
-        new_url += str(i)
+    for i in range(1, 20):
+        new_url = basic_url + str(i)
         butac_scrap_download(new_url, str(i))
 
 
@@ -198,8 +196,7 @@ def bufale_checkupdates():
     basic_url = "https://www.bufale.net/bufala/page/"
     # bufale_scrap_download("https://www.bufale.net/bufala", str(1))
     for i in range(10, 20):
-        new_url = basic_url
-        new_url += str(i)
+        new_url = basic_url + str(i)
         bufale_scrap_download(new_url, str(i))
 
 
@@ -214,22 +211,20 @@ def news_control(news: str, site: str):
     try:
         input1_string = count_frequencies(text_analysis(news))
         directory = "./" + site + "/Pagine/"
-        simil_records = []
-        simil_texts = []
+        simil_records, simil_texts = [], []
         for filename in os.listdir(directory):
             with open(directory + filename, 'r') as f:
                 input2 = f.read()
                 simil_records.append(simil_spacy(input1_string, input2))
                 simil_texts.append(str(filename))
 
-        for _ in range(0, 3):
+        for _ in range(3):
             m = max(simil_records)
             if site == "BufaleNet":
                 print("https://www.bufale.net/" + simil_texts[simil_records.index(m)][:-4] + " : " + str(m))
-                simil_records.remove(m)
             else:
                 print("https://www.butac.it/" + simil_texts[simil_records.index(m)][:-4] + " : " + str(m))
-                simil_records.remove(m)
+            simil_records.remove(m)
 
     except FileNotFoundError:
         print("No directory with this name.")
@@ -247,8 +242,11 @@ def analyze_news():
     news_control(text, "Butac")
 
 
+clean_dir("./BufaleNet/Indici/")
+clean_dir("./BufaleNet/Pagine/")
+clean_dir("./Butac/Indici/")
+clean_dir("./Butac/Pagine/")
+# bufale_checkupdates()
+butac_checkupdates()
 analyze_news()
 
-# bufale_checkupdates()
-
-# butac_checkupdates()
