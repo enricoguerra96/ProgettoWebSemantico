@@ -19,6 +19,8 @@ Tutto il codice è in _FileAnalysis.py_
 
 **Se la news è presente nei due siti, sicuramente comparirà tra le 3 news riportate.**
 
+## Spiegazione dettagliata metodi
+
 ## Miglioramenti possibili
 1. Non ho usato Stemming, Lemmatizzazione, POS tagging. Peggioravano gli indici di similarità, e il POS tagging in italiano è molto impreciso.
 2. Il taglio delle parole con TF = 1 è stato fatto per ridurre le ridondanze nei testi, troppo lunghi altrimenti.
