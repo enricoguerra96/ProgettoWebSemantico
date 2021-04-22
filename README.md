@@ -22,17 +22,17 @@ Tutto il codice è in _FileAnalysis.py_
 ## Spiegazione dettagliata metodi difficili
 
 1. _bufale_scrap_download(url, index)_ : 
-  Obiettivo: avere i BoW di tutte le news del sito già scaricate.
+  - Obiettivo: avere i BoW di tutte le news del sito già scaricate.
   - Questo metodo inizia con il download con la libreria **urllib** delle pagine indice di Bufale.net nella cartella Indici.
   - Con **BeautifulSoup** si selezionano i link ad ogni pagina (_hrefs_), salvandoli in una lista _in_hrefs_. Vengono salvati anche il corrispettivo titolo e il testo della pagina linkata salvandoli nella lista _in_links_. _in_links_ costituirà la lista dei BoW da confrontare con la news in input, _in_hrefs_ la lista dei link da riportare nel risultato.
   - I BoW dei testi in _in_links_ verranno salvati in files di testo nella cartella Pagine, ogni file avrà il nome del corrispondente _in_href_ appositamente modificato.
  
  2. _butac_scrap_download(url, index)_
-  Obiettivo: avere i BoW di tutte le news del sito già scaricate.
+  - Obiettivo: avere i BoW di tutte le news del sito già scaricate.
   Il metodo segue la stessa logica del precedente. La complessità di Butac ha reso necessaria l'aggiunta della lista _whocares_hrefs_ per l'eliminazione di link inutili presenti in tutte le pagine di indicizzazione.
  
  3. _news_control(news, site)_
- Obiettivo: Calcolare l'indice di similarità di ogni file presente in Pagine con il testo fornito in input.
+ - Obiettivo: Calcolare l'indice di similarità di ogni file presente in Pagine con il testo fornito in input.
  - Viene prima creato il BoW del testo fornito in input
  - Per ogni file l'indice di similarità viene calcolato e salvato in _simil_records_, insieme al nome del file salvato in _simil_texts_.
  - Vengono poi mostrati i primi 3 files con indici di similarità maggiori sia per Butac che per Bufale.net. La similarità è approssimata alla seconda cifra decimale.
