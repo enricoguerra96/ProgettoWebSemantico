@@ -169,7 +169,7 @@ def butac_scrap_download(url: str, index: str):
         contents = f.read()
         soup = BeautifulSoup(contents, 'lxml')
 
-    # Move links(titles) to in_links
+    # Move links(titles) to in_links and hrefs to in_hrefs
     whocares_hrefs = ['https://www.butac.it/guida-2/', 'https://www.butac.it/fake-news/',
                       'https://www.butac.it/notizia-vera/',
                       'https://www.butac.it/speciale-coronavirus-covid-19/', 'https://www.butac.it/ambiente-e-animali/',
@@ -180,7 +180,7 @@ def butac_scrap_download(url: str, index: str):
                       'https://www.butac.it/parlano-di-noi/',
                       'https://www.butac.it/citazioni-e-leggende-urbane/']
 
-    in_links, in_hrefs, in_hrefs_ok, in_texts_href, in_texts_href_ok = [], [], [], [], []
+    in_links, in_hrefs, in_texts_href = [], [], []
     for element in soup.find_all('a'):
         href = element.get('href')
         if str(href) is not None and str(href) != '' and str(href) not in whocares_hrefs \
@@ -188,12 +188,8 @@ def butac_scrap_download(url: str, index: str):
             in_texts_href.append(element.text)
             in_hrefs.append(str(href))
 
-    # Remove duplicate hrefs
-    [in_hrefs_ok.append(x) for x in in_hrefs if x not in in_hrefs_ok]
-    [in_texts_href_ok.append(x) for x in in_texts_href if x not in in_texts_href_ok]
-
     # Scrap texts from pages
-    for ok_link in in_hrefs_ok:
+    for ok_link in in_hrefs:
         page = requests.get(ok_link)
         text_soup = BeautifulSoup(page.text, "lxml")
         temp = ""
@@ -210,16 +206,15 @@ def butac_scrap_download(url: str, index: str):
 
 
 def butac_checkupdates():
-    # Refresh scraped pages
+    # Refresh scraped pages downloading pages and indexes again
     basic_url = "https://www.butac.it/bufala/page/"
-    butac_scrap_download("https://www.butac.it/bufala", str(1))
-    for i in range(1, 10):
+    for i in range(1, 20):
         new_url = basic_url + str(i)
         butac_scrap_download(new_url, str(i))
 
 
 def bufale_checkupdates():
-    # Refresh scraped pages
+    # Refresh scraped pages downloading pages and indexes again
     basic_url = "https://www.bufale.net/bufala/page/"
     bufale_scrap_download("https://www.bufale.net/bufala", str(1))
     for i in range(1, 10):
@@ -239,6 +234,7 @@ def news_control(news: str, site: str):
         input1_string = bow_to_str(create_bow(text_analysis(news)))
         if len(input1_string.strip()) == 0:
             return print("The input news is too short. Please insert a longer text.")
+
         directory = "./" + site + "/Pagine/"
         simil_records, simil_texts = [], []
         for filename in os.listdir(directory):
