@@ -1,8 +1,8 @@
 # ProgettoWebSemantico
 
-Primo prototipo di progetto web semantico, classificazione di testi e confronto su siti di rilevazione fake news.
+Prototipo di progetto web semantico, classificazione di testi e confronto su siti di rilevazione fake news.
 
-**Input**: testo di una news 
+**Input**: File con testo di fake news 
 
 **Output**: eventuali errori grammaticali e prime 3 news più simili nei siti Butac e BufaleNet.
 
